@@ -1,5 +1,6 @@
 import { InternalServerErrorException, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { EmailGuard } from 'src/auth/guards/email.guard';
 import { GqlAuthGuard } from 'src/auth/guards/gql-auth.guard';
 import CurrentUser from 'src/decorators/current-user.decorator';
 import { User } from '../users/models/user';
@@ -23,7 +24,7 @@ export class ProfilesResolver {
     return await this.profilesService.getByUsername(username);
   }
 
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard, EmailGuard)
   @Mutation(() => Profile)
   public async createProfile(
     @CurrentUser() user: User,
@@ -52,7 +53,7 @@ export class ProfilesResolver {
     }
   }
 
-  @UseGuards(GqlAuthGuard)
+  @UseGuards(GqlAuthGuard, EmailGuard)
   @Mutation(() => Profile)
   public async updateProfile(
     @CurrentUser() user: User,
