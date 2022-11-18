@@ -21,7 +21,7 @@ import { UsersModule } from './modules/users/users.module';
      *  is running under a development environment.
      */
     GraphQLModule.forRoot({
-      autoSchemaFile: join(__dirname, 'graphql', 'schema.gql'),
+      autoSchemaFile: join(process.cwd(), 'graphql', 'schema.gql'),
       driver: ApolloDriver,
     }),
 
