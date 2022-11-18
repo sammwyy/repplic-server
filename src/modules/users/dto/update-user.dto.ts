@@ -7,8 +7,4 @@ export default class UpdateUserDTO {
   @MaxLength(256)
   @Field(() => String, { nullable: true })
   email?: string;
-
-  @MaxLength(64)
-  @Field(() => String, { nullable: true })
-  displayName?: string;
 }

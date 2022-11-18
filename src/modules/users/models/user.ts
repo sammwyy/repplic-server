@@ -10,11 +10,7 @@ export class User {
   _id: string;
 
   @Field()
-  @Prop({ required: true })
-  displayName: string;
-
-  @Field()
-  @Prop({ lowercase: true, required: true })
+  @Prop({ lowercase: true, required: true, unique: true })
   email: string;
 
   @Field()
@@ -23,6 +19,10 @@ export class User {
 
   @Prop({ required: true })
   password: string;
+
+  @Field({ nullable: true })
+  @Prop()
+  profile: string;
 
   comparePassword: (candidate: string) => Promise<boolean>;
 }

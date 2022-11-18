@@ -13,9 +13,4 @@ export default class CreateUserDTO {
   @Length(8, 256)
   @Field(() => String)
   password: string;
-
-  @IsNotEmpty()
-  @MaxLength(64)
-  @Field(() => String)
-  displayName: string;
 }

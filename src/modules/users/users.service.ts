@@ -84,4 +84,23 @@ export class UsersService {
     await (user as UserDocument).save();
     return true;
   }
+
+  public async setProfileToUser(
+    userID: string,
+    profileID: string,
+  ): Promise<boolean> {
+    const user = await this.getByID(userID);
+
+    if (!user) {
+      throw UsersService.USER_NOT_FOUND;
+    }
+
+    if (user.profile == null) {
+      user.profile = profileID;
+      await (user as UserDocument).save();
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
