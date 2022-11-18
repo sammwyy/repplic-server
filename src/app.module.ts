@@ -5,8 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { join } from 'path';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ProfilesModule } from './modules/profile/profiles.module';
 import { SessionsModule } from './modules/sessions/sessions.module';
@@ -23,6 +21,7 @@ import { UsersModule } from './modules/users/users.module';
     GraphQLModule.forRoot({
       autoSchemaFile: join(process.cwd(), 'graphql', 'schema.gql'),
       driver: ApolloDriver,
+      path: '/',
     }),
 
     /**
@@ -39,7 +38,5 @@ import { UsersModule } from './modules/users/users.module';
     SessionsModule,
     UsersModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
