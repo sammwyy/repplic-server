@@ -7,7 +7,7 @@ import CurrentUser from 'src/decorators/current-user.decorator';
 
 import CreateUserDTO from './dto/create-user.dto';
 import UpdatePasswordDTO from './dto/update-password.dto';
-import UpdateUserDTO from './dto/update-user.dto';
+// import UpdateUserDTO from './dto/update-user.dto';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -18,6 +18,7 @@ export class UsersResolver {
     return this.usersService.create(payload);
   }
 
+  /* Todo: Disable update user until email verification for this mutation is ready.
   @Mutation(() => Boolean)
   @UseGuards(GqlAuthGuard)
   public updateUser(
@@ -26,6 +27,7 @@ export class UsersResolver {
   ): Promise<boolean> {
     return this.usersService.update(user._id, payload);
   }
+  */
 
   @Mutation(() => Boolean)
   @UseGuards(GqlAuthGuard)
