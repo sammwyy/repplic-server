@@ -41,4 +41,13 @@ export class UsersResolver {
   async getCurrentUser(@CurrentUser() user: User): Promise<User> {
     return user;
   }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GqlAuthGuard)
+  public verifyUser(
+    @CurrentUser() user: User,
+    @Args('code') code: string,
+  ): Promise<boolean> {
+    return this.usersService.tryVerifyUser(user._id, code);
+  }
 }

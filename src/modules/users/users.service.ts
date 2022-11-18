@@ -6,10 +6,14 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
+import { MailerService } from '@nestjs-modules/mailer';
+
 import { User, UserDocument } from './models/user';
+
 import CreateUserDTO from './dto/create-user.dto';
 import UpdatePasswordDTO from './dto/update-password.dto';
 import UpdateUserDTO from './dto/update-user.dto';
+import { randomStringNumber } from 'src/utils/random.utils';
 
 @Injectable()
 export class UsersService {
@@ -25,10 +29,15 @@ export class UsersService {
     'WRONG_PASSWORD',
     'Incorrect old password.',
   );
+  public static WRONG_VERIFICATION_CODE = new UnauthorizedException(
+    'WRONG_VERIFICATION_CODE',
+    'Email verification code invalid or expired.',
+  );
 
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
+    private readonly mailerService: MailerService,
   ) {}
 
   public getByEmail(email: string): Promise<User | undefined> {
@@ -42,13 +51,42 @@ export class UsersService {
     return this.userModel.findOne({ _id: id }).exec();
   }
 
+  public async sendWelcome(user: User): Promise<void> {
+    const to = user.email;
+    const from = `"${process.env['MAIL_TITLE']}" <${process.env['ACCOUNT_MAIL']}>`;
+
+    await this.mailerService.sendMail({
+      to,
+      from,
+      subject: 'Welcome! Thanks for joining',
+      template: 'welcome',
+    });
+  }
+
+  public async sendVerificationCode(user: User): Promise<void> {
+    const to = user.email;
+    const from = `"${process.env['MAIL_TITLE']}" <${process.env['ACCOUNT_MAIL']}>`;
+
+    await this.mailerService.sendMail({
+      to,
+      from,
+      subject: 'Verify your account',
+      template: 'verify-account',
+      context: {
+        code: user.verificationCode,
+      },
+    });
+  }
+
   public async create(payload: CreateUserDTO): Promise<User> {
     if (await this.getByEmail(payload.email)) {
       throw UsersService.EMAIL_IN_USE;
     }
 
     const user = new this.userModel(payload);
+    user.verificationCode = randomStringNumber(6);
     await user.save();
+    this.sendVerificationCode(user);
     return user;
   }
 
@@ -102,5 +140,30 @@ export class UsersService {
     } else {
       return false;
     }
+  }
+
+  public async verifyUser(userID: string): Promise<boolean> {
+    await this.userModel.findByIdAndUpdate(userID, {
+      emailVerified: true,
+      verificationCode: null,
+    });
+    return true;
+  }
+
+  public async tryVerifyUser(userID: string, code: string): Promise<boolean> {
+    const modified = await this.userModel.findOneAndUpdate(
+      { _id: userID, verificationCode: code },
+      {
+        emailVerified: true,
+        verificationCode: null,
+      },
+    );
+
+    if (!modified) {
+      throw UsersService.WRONG_VERIFICATION_CODE;
+    }
+
+    await this.sendWelcome(modified);
+    return true;
   }
 }

@@ -24,6 +24,9 @@ export class User {
   @Prop()
   profile: string;
 
+  @Prop()
+  verificationCode: string;
+
   comparePassword: (candidate: string) => Promise<boolean>;
 }
 

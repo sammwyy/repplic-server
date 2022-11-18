@@ -45,6 +45,7 @@ type Mutation {
   createUser(payload: CreateUserDTO!): User!
   updateUser(payload: UpdateUserDTO!): Boolean!
   updatePassword(payload: UpdatePasswordDTO!): Boolean!
+  verifyUser(code: String!): Boolean!
   createProfile(payload: CreateProfileDTO!): Profile!
   updateProfile(payload: UpdateProfileDTO!): Profile!
 }
